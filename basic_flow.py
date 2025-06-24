@@ -18,11 +18,20 @@ The flow consists of three steps:
 1. Generate a random city from Europe.
 2. Fetch the weather data for the generated city.
 3. Summarize the fetched weather data.
+
 '''
 
 class ExampleFlow(Flow):
     model = "gemini/gemini-2.0-flash"  
 
+    '''
+    Step 1: Generate a random city from Europe.
+    
+    Start the flow with an initial state.
+    The following function is the entry point of the flow.
+    It generates a random city from the European continent.
+    The `@start` decorator indicates that this function is the starting point of the flow.
+      '''
     @start()
     def generate_city(self):
         print("Starting flow")
@@ -43,6 +52,14 @@ class ExampleFlow(Flow):
         print(f"Random City: {random_city}")
         return random_city
 
+
+    '''
+    Step 2: Fetch the weather data for the generated city.
+    
+    This function listens for the output of the `generate_city` function.
+    It uses the OpenWeatherMap API to fetch the weather data for the city.
+    The `@listen` decorator indicates that this function will be triggered when the `generate_city` function completes.
+    '''
     @listen(generate_city)
     def get_weather_data(self, random_city):
         print(f"Getting weather data for {random_city}")
@@ -63,6 +80,14 @@ class ExampleFlow(Flow):
             print(f"Error fetching weather data: {e}")
             return None
 
+    
+    '''
+    Step 3: Summarize the fetched weather data.
+    
+    This function listens for the output of the `get_weather_data` function.
+    It uses the Gemini model to summarize the weather data.
+    The `@listen` decorator indicates that this function will be triggered when the `get_weather_data` function completes.
+    ''' 
     @listen(get_weather_data)
     def summarize_weather(self, weather_data):
         if not weather_data:
