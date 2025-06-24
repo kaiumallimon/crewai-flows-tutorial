@@ -10,6 +10,16 @@ load_dotenv()
 open_weather_map_apikey = os.getenv("OPENWEATHER_MAP_API_KEY")
 open_weather_map_url = os.getenv("OPENWEATHER_MAP_URL")
 
+'''
+This example demonstrates a basic flow that generates a random city from Europe,
+fetches the weather data for that city using the OpenWeatherMap API, and summarizes the weather data.
+
+The flow consists of three steps:
+1. Generate a random city from Europe.
+2. Fetch the weather data for the generated city.
+3. Summarize the fetched weather data.
+'''
+
 class ExampleFlow(Flow):
     model = "gemini/gemini-2.0-flash"  
 
