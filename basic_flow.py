@@ -1,0 +1,82 @@
+from crewai.flow.flow import Flow, listen, start
+from dotenv import load_dotenv
+from litellm import completion
+import requests
+import os
+
+# Load environment variables
+load_dotenv()
+
+open_weather_map_apikey = os.getenv("OPENWEATHER_MAP_API_KEY")
+open_weather_map_url = os.getenv("OPENWEATHER_MAP_URL")
+
+class ExampleFlow(Flow):
+    model = "gemini/gemini-2.0-flash"  
+
+    @start()
+    def generate_city(self):
+        print("Starting flow")
+        print(f"Flow State ID: {self.state['id']}")
+
+        response = completion(
+            model=self.model,
+            messages=[
+                {
+                    "role": "user",
+                    "content": "Return the name of a random city from european continent.",
+                },
+            ],
+        )
+
+        random_city = response["choices"][0]["message"]["content"]
+        self.state["city"] = random_city
+        print(f"Random City: {random_city}")
+        return random_city
+
+    @listen(generate_city)
+    def get_weather_data(self, random_city):
+        print(f"Getting weather data for {random_city}")
+
+        params = {
+            'q': random_city,
+            'appid': open_weather_map_apikey,
+            'units': 'metric'  # Use metric for Celsius
+        }
+
+        try:
+            response = requests.get(open_weather_map_url, params=params)
+            response.raise_for_status()
+            weather_data = response.json()
+            self.state["weather_data"] = weather_data
+            return weather_data
+        except requests.RequestException as e:
+            print(f"Error fetching weather data: {e}")
+            return None
+
+    @listen(get_weather_data)
+    def summarize_weather(self, weather_data):
+        if not weather_data:
+            return "Failed to fetch weather data."
+
+        print(f"Weather data: {weather_data}")
+
+        response = completion(
+            model=self.model,
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"Summarize the following weather data: {weather_data}",
+                },
+            ],
+        )
+
+        summary = response["choices"][0]["message"]["content"]
+        self.state["summary"] = summary
+        return summary
+
+
+# Run the flow
+flow = ExampleFlow()
+flow.plot()
+result = flow.kickoff()
+print(f"Generated Weather Summary: {result}")
