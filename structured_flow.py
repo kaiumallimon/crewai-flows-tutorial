@@ -18,21 +18,21 @@ class ExampleState(BaseModel):
   counter:int = 0
 
 # Define the structured flow  
-class StructuredFlow(Flow):
+class StructuredFlow(Flow[ExampleState]):
   # Define the flow state
-  flowState = ExampleState()
+  # state = ExampleState()
   
   # start method to initialize the flow
   @start()
   def method1(self):
     print("Starting flow...")
-    print(f'LOGGER :: Before updating State: {self.flowState}')
+    print(f'LOGGER :: Before updating State: {self.state}')
     
     # Update the flow state
-    self.flowState.message += ' -- Update (1)'
-    self.flowState.counter = self.flowState.counter+1
+    self.state.message += ' -- Update (1)'
+    self.state.counter = self.state.counter+1
     
-    print(f"LOGGER :: After updating State inside method1: {self.flowState}")
+    print(f"LOGGER :: After updating State inside method1: {self.state}")
    
   # listen to the output of method1 
   @listen(method1)
@@ -40,10 +40,10 @@ class StructuredFlow(Flow):
     print("Inside method2:")
     
     # Update the flow state
-    self.flowState.message += ' -- Update (2)'
-    self.flowState.counter = self.flowState.counter+1
+    self.state.message += ' -- Update (2)'
+    self.state.counter = self.state.counter+1
     
-    print(f"LOGGER :: After updating State inside method2: {self.flowState}")
+    print(f"LOGGER :: After updating State inside method2: {self.state}")
   
 
 # Create an instance of the structured flow and kickoff the flow
