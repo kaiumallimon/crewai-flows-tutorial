@@ -1,3 +1,7 @@
 crewai
 python-dotenv
 requests
+docling
+fastapi[standard]
+langchain_google_genai
+google-generativeai

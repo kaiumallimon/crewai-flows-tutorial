@@ -4,3 +4,6 @@
 
 # python virtual environment
 venv/
+
+#ignore pycache files
+__pycache__/
